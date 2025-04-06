@@ -1,11 +1,7 @@
-import { useState } from "react";
 import { AiMessageComponent } from "./ai-message.component"
 import { UserMessageComponent } from "./user-message.component";
-import { AuthComponent } from "./auth.component";
 
 export const ConversionComponent = () => {
-
-    const [loggedIn, setLoggedIn] = useState(false);
 
     return (
         <div style={
@@ -25,14 +21,12 @@ export const ConversionComponent = () => {
                 <p className="text-sm text-[#6b7280] leading-3">Hi, how can I help you today?</p>
             </div>
 
-            {<div className="pr-4 h-[474px]" style={{ "minWidth": "100%; display: table;" }}>
-                {loggedIn ? <>
+            <div className="pr-4 h-[474px]" style={{ "minWidth": "100%; display: table;" }}>
+                <>
                     <UserMessageComponent />
                     <AiMessageComponent />
-                </> : <>
-                    <AuthComponent />
-                </>}
-            </div>}
+                </>
+            </div>
 
             <div className="flex items-center pt-0">
                 <form className="flex items-center justify-center w-full space-x-2">

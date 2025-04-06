@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { ConversionComponent } from "./component/conversion.component";
+import { SecurityManager } from "./util/security-manager";
+import { AuthComponent } from "./component/auth.component";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const [conversionActive, setConversionActive] = useState(false);
 
+  const [loggedIn, setLoggedIn] = useState(SecurityManager.loggedIn());
+
+  const handleLogIn = () => {
+    setLoggedIn(SecurityManager.loggedIn());
+  }
+
   return (
     <div className="bg-gradient-to-r from-blue-500 to-teal-500 min-h-screen">
-
+      <Toaster />
       {/* Full-Page Landing Section */}
       <div className="flex flex-col items-center justify-center text-center text-white px-6 py-12 bg-black bg-opacity-50 min-h-screen">
         <h1 className="text-5xl font-semibold mb-4 animate__animated animate__fadeIn">
@@ -19,6 +28,7 @@ function App() {
           Fast, efficient, and convenient dental care right at your fingertips.
         </p>
         <button
+          disabled={conversionActive}
           onClick={() => setConversionActive((prev) => !prev)}
           className="py-3 px-8 bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
         >
@@ -91,6 +101,7 @@ function App() {
 
       {/* Chatbot Floating Button */}
       <button
+        disabled={conversionActive}
         onClick={() => setConversionActive((prev) => !prev)}
         className="fixed bottom-4 right-4 inline-flex items-center justify-center text-sm font-medium disabled:pointer-events-none disabled:opacity-50 border rounded-full w-16 h-16 bg-black hover:bg-gray-700 m-0 cursor-pointer border-gray-200 bg-none p-0 normal-case leading-5 hover:text-gray-900"
         type="button" aria-haspopup="dialog" aria-expanded="false" data-state="closed"
@@ -103,7 +114,9 @@ function App() {
       </button>
 
       {/* ConversionComponent (Chatbot) */}
-      {conversionActive && <ConversionComponent />}
+      {conversionActive && <>
+        {loggedIn ? <ConversionComponent /> : <AuthComponent handleLogIn={handleLogIn} />}
+      </>}
     </div>
   );
 }

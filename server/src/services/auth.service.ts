@@ -19,10 +19,17 @@ export const signup = async (signUpReq: SignupReq) => {
     password: hashedPassword
   } as User);
 
+  const token = jwt.sign({ id: createdUser._id?.toString(), email: createdUser.email }, JWT_SECRET, {
+    expiresIn: '1d',
+  });
+
   return {
-    id: createdUser._id,
-    email: createdUser.email,
-    name: createdUser.name,
+    token,
+    user: {
+      id: createdUser._id,
+      email: createdUser.email,
+      name: createdUser.name,
+    },
   };
 };
 
