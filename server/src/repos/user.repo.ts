@@ -1,7 +1,7 @@
 // src/repos/user.repo.ts
 import { ObjectId } from 'mongodb';
 import { connectDB } from '../config/db';
-import { User } from '../models/user';
+import { User } from '../models/user.model';
 
 const COLLECTION_NAME = 'users';
 

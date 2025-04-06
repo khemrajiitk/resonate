@@ -1,6 +1,7 @@
 import { MongoClient, Db } from 'mongodb';
 
 const mongoURI = process.env.MONGO_URI as string;
+const dbName = process.env.DB_NAME || 'resonate'; // fallback if DB_NAME is not set
 
 if (!mongoURI) {
   throw new Error('❌ MONGO_URI is not defined in .env file');
@@ -15,8 +16,8 @@ export const connectDB = async (): Promise<Db> => {
   try {
     client = new MongoClient(mongoURI);
     await client.connect();
-    db = client.db(); // default DB from URI
-    console.log('✅ Connected to MongoDB using native driver');
+    db = client.db(dbName); // specify DB name explicitly
+    console.log(`✅ Connected to MongoDB database: ${dbName}`);
     return db;
   } catch (err) {
     console.error('❌ Failed to connect to MongoDB:', err);
