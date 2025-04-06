@@ -1,16 +1,15 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+import routes from './routes';
+import { errorHandler } from './middlewares/error.middleware';
 
 const app = express();
 
 app.use(express.json());
 
-app.get('/ping', (req: Request, res: Response) => {
-    res.send(`Pong ${new Date()}`);
-});
+// Prefix all routes with /v1
+app.use('/v1', routes);
 
-// Global error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    res.status(500).send('');  // Return generic error message
-});
+// Global error handling middleware (must be after all routes)
+app.use(errorHandler);
 
-export default app; // Export the app instance to be used in server.ts
+export default app;
