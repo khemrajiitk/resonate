@@ -19,7 +19,7 @@ function App() {
           Fast, efficient, and convenient dental care right at your fingertips.
         </p>
         <button
-          onClick={() => setConversionActive(true)}
+          onClick={() => setConversionActive((prev) => !prev)}
           className="py-3 px-8 bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
         >
           Start Booking
