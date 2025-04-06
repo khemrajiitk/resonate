@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Custom global styles */
+body {
+  @apply bg-white text-gray-800 font-sans;
+}
+
+/* Optional: set base font style */
+html {
+  font-family: 'Inter', sans-serif;
+}
