@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chat } from "../response/chat.response";
 import { AiMessageComponent } from "./ai-message.component"
 import { UserMessageComponent } from "./user-message.component";
@@ -11,6 +11,11 @@ export const ConversionComponent = () => {
     const [message, setMessage] = useState<string>('');
     const [chats, setChats] = useState<Chat[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const bottomRef = useRef<HTMLDivElement | null>(null);
+
+    const scrollToBottom = () => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
     const fetchChats = async () => {
         setIsLoading(true);
@@ -53,6 +58,10 @@ export const ConversionComponent = () => {
         fetchChats();
     }, []);
 
+    useEffect(() => {
+        scrollToBottom();
+    }, [chats]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         askQuestion();
@@ -83,6 +92,7 @@ export const ConversionComponent = () => {
                         <AiMessageComponent key={index} chat={chat} />
                     )
                 )}
+                <div ref={bottomRef} />
             </div>
 
             <div className="flex items-center pt-0">
