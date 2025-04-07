@@ -17,3 +17,4 @@ export const getChatsByUserId = async (userId: string): Promise<Chat[]> => {
   const db = await connectDB();
   return db.collection<Chat>(COLLECTION_NAME).find({ "user.id": userId }).toArray();
 };
+

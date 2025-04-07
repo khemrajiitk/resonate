@@ -7,13 +7,11 @@ const miniUserSchema = z.object({
     name: z.string(),
 });
 
-const messageSchema = z.object({
+export const messageSchema = z.object({
     content: z.string(),
-    data: z.object({
-        appointment: createAppointmentSchema.optional(),
-        updateAppointment: updateAppointmentSchema.optional(),
-    }).optional(),
-});
+    intent: z.string().optional(),
+    data: z.any().optional(),
+  });
 
 export const createChatSchema = z.object({
     user: miniUserSchema,
