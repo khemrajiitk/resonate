@@ -2,7 +2,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { AuthService } from "../service/auth.service";
 import { SecurityManager } from "../util/security-manager";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { User } from "../response/auth.response";
 
 // Zod Schemas
