@@ -1,0 +1,89 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+
+env:
+  IMAGE_NAME: ui-service  # Replace with your desired image name
+  REGION: asia-south1  # Change to your GCP region
+  REPOSITORY_NAME: be-images  # Change to your Artifact Registry repository name
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1.1.0
+        with:
+          service_account_key: ${{ secrets.GCP_SERVICE_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT }}
+
+      # Step 3: Authenticate Docker with Google Artifact Registry
+      - name: Authenticate Docker with Google Artifact Registry
+        run: |
+          echo "${{ secrets.GCP_SERVICE_KEY }}" | base64 --decode > $HOME/gcp-key.json
+          gcloud auth activate-service-account --key-file=$HOME/gcp-key.json
+          gcloud config set project ${{ secrets.GCP_PROJECT }}
+          gcloud auth configure-docker us-docker.pkg.dev
+
+      # Step 4: Debug Authentication & IAM Policies
+      - name: Debug GCP Authentication & IAM Roles
+        run: |
+          echo "🔹 Listing authenticated accounts..."
+          gcloud auth list
+          
+          echo "🔹 Checking current GCP project..."
+          gcloud config list
+
+          echo "🔹 Verifying IAM roles assigned to service account..."
+          gcloud projects get-iam-policy ${{ secrets.GCP_PROJECT }} --flatten="bindings[].members" --format="table(bindings.role)"
+
+      # Step 5: Ensure Artifact Registry Repository Exists
+      - name: Ensure Artifact Registry Repository Exists
+        run: |
+          REPO_EXISTS=$(gcloud artifacts repositories list --location=${{ env.REGION }} \
+            --filter="name:${{ env.REPOSITORY_NAME }}" --format="value(name)")
+
+          if [[ -z "$REPO_EXISTS" ]]; then
+            echo "🚀 Repository ${{ env.REPOSITORY_NAME }} does not exist. Creating it now..."
+            gcloud artifacts repositories create ${{ env.REPOSITORY_NAME }} \
+              --repository-format=docker \
+              --location=${{ env.REGION }} \
+              --description="Automatically created repository for Cloud Run deployment"
+            echo "✅ Repository created successfully!"
+          else
+            echo "✅ Repository ${{ env.REPOSITORY_NAME }} already exists."
+          fi
+
+      # Step 7: Build the Docker image
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -f ui/Dockerfile \
+            -t us-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }} \
+            ui
+
+      # Step 8: Push the Docker image to Artifact Registry
+      - name: Push Docker image
+        run: |
+          echo "🚀 Pushing Docker image..."
+          docker push us-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}
+
+      # Step 9: Deploy to Cloud Run
+      - name: Deploy to Cloud Run
+        run: |
+          echo "🚀 Deploying to Cloud Run..."
+          gcloud run deploy ${{ env.IMAGE_NAME }} \
+            --image us-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated
