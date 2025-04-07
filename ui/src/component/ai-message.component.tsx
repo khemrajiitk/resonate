@@ -1,4 +1,14 @@
-export const AiMessageComponent = () => {
+import { Chat } from "../response/chat.response";
+import ReactMarkdown from "react-markdown"
+
+interface AiMessageComponentProps {
+    chat: Chat;
+}
+
+export const AiMessageComponent = ({ chat }: AiMessageComponentProps) => {
+
+    if (!chat.message?.content) return null
+
     return (<div className="flex gap-3 my-4 text-gray-600 text-sm flex-1"><span
         className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
         <div className="rounded-full bg-gray-100 border p-1"><svg stroke="none" fill="black" stroke-width="1.5"
@@ -8,8 +18,11 @@ export const AiMessageComponent = () => {
             </path>
         </svg></div>
     </span>
-        <p className="leading-relaxed"><span className="block font-bold text-gray-700">AI </span>Hi, how can I help you today?
-        </p>
+        <div className="flex-1">
+            <div className="whitespace-pre-wrap break-words w-full">
+                <ReactMarkdown>{chat.message.content}</ReactMarkdown>
+            </div>
+        </div>
     </div>
     );
 };

@@ -32,12 +32,10 @@ export const generateAIResponse = async (chatHistory: Chat[], slots: Slot[], app
         let parsedResponse: any = {};
 
         try {
-            const match = responseText.match(/{[\s\S]*}/); // Match the first full JSON object
-            if (match) {
-                parsedResponse = JSON.parse(match[0]);
-            } else {
-                parsedResponse = { content: responseText }; // Fallback to full text
-            }
+            console.log("Response======>:", response);
+            console.log("Response Test======>:", response.text);
+            parsedResponse = extractFirstJSON(response.text);
+            console.log("Parsed response:", parsedResponse);
         } catch (error) {
             console.error("Failed to parse JSON:", error);
             parsedResponse = { content: responseText };
@@ -49,6 +47,78 @@ export const generateAIResponse = async (chatHistory: Chat[], slots: Slot[], app
         throw new Error('Failed to generate AI response');
     }
 };
+
+const extractFirstJSON = (responseText?: string): any => {
+    if (!responseText) return { content: '' };
+
+    responseText = responseText.trim();
+    let input = '';
+
+    if (responseText.includes('```ts')) {
+        input = responseText.split('```ts')[1] || '';
+    } else if (responseText.includes('```json')) {
+        input = responseText.split('```json')[1] || '';
+    } else if (responseText.includes('```')) {
+        input = responseText.split('```')[1] || '';
+    } else {
+        return {
+            content: responseText.trim(),
+            intent: 'Unknown',
+        };
+    }
+
+    input = input.replace(/```/g, '').trim();
+
+    try {
+        // Some models return a JSON string as a string literal. Let's check and fix that.
+        if (input.startsWith('"') || input.startsWith("'")) {
+            // Try to remove the surrounding quotes and parse again
+            const unquoted = input
+                .replace(/^['"]/, '')
+                .replace(/['"]$/, '')
+                .replace(/\\"/g, '"') // Unescape escaped quotes
+                .replace(/\\n/g, '') // Remove newlines
+                .trim();
+
+            console.log('Unquoted input:', unquoted);
+            return JSON.parse(unquoted);
+        }
+
+
+        try {
+            const fixed = input
+                .replace(/(\w+):/g, '"$1":') // wrap unquoted keys
+                .replace(/'/g, '"');         // replace single quotes with double quotes
+
+            const parsed = JSON.parse(fixed);
+            console.log(parsed);
+            return parsed;
+        } catch (error) {
+            console.log("Input======>:", input);
+            try {
+                const fixed = input
+                    .replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":') // quote unquoted keys
+                    .replace(/‘|’/g, "'") // replace curly quotes with straight single quotes
+                    .replace(/“|”/g, '"') // replace curly double quotes
+                    .replace(/'/g, '"');  // convert all single quotes to double quotes
+
+                const parsed = JSON.parse(fixed);
+                console.log(parsed);
+                return parsed;
+            } catch (error) {
+                console.error("Invalid JSON:", error);
+                return JSON.parse(input);
+            }
+        }
+    } catch (err) {
+        console.error("Failed to parse structured response:", err);
+        return {
+            content: input.trim(),
+            intent: 'Unknown',
+        };
+    }
+}
+
 
 export const getInstruction = (slots: Slot[], appointments: Appointment[], user?: User | null): string => {
     const relativeDates = getRelativeDateStrings().join("\n");

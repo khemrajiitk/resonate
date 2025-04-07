@@ -1,4 +1,12 @@
-export const UserMessageComponent = () => {
+import { Chat } from "../response/chat.response";
+import ReactMarkdown from "react-markdown"
+
+interface UserMessageComponentProps {
+    chat: Chat;
+}
+
+export const UserMessageComponent = ({ chat }: UserMessageComponentProps) => {
+    if (!chat.message?.content) return null
     return (
         <div className="flex gap-3 my-4 text-gray-600 text-sm flex-1"><span
             className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
@@ -9,7 +17,11 @@ export const UserMessageComponent = () => {
                 </path>
             </svg></div>
         </span>
-            <p className="leading-relaxed"><span className="block font-bold text-gray-700">You </span>fewafef</p>
+            <div className="flex-1 prose prose-sm max-w-none">
+                <ReactMarkdown>
+                    {chat.message.content}
+                </ReactMarkdown>
+            </div>
         </div>
     );
 };

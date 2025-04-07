@@ -5,8 +5,8 @@ import { CustomRequest } from '../utils/custom.request';
 export const createChat = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     req.logger?.info({ message: 'Creating chat' });
-    const chat = await ChatService.createChat(req.body);
-    res.status(201).json({ chat });
+    const chats = await ChatService.createChat(req.body);
+    res.status(201).json({ chats });
   } catch (error) {
     next(error);
   }
