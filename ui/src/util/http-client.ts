@@ -11,7 +11,7 @@ const httpClient = axios.create({
 });
 
 httpClient.interceptors.request.use(
-    async (config) => {
+    async (config: any) => {
         const token = SecurityManager.getAuthToken();
         if (token) {
             config.headers["Authorization"] = `Bearer ${token}`;

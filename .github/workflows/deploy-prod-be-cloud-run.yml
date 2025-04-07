@@ -6,7 +6,7 @@ on:
       - main  # Trigger on push to the main branch
 
 env:
-  IMAGE_NAME: main-service  # Replace with your desired image name
+  IMAGE_NAME: be-service  # Replace with your desired image name
   REGION: asia-south1  # Change to your GCP region
   REPOSITORY_NAME: be-images  # Change to your Artifact Registry repository name
 
