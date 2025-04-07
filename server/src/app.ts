@@ -11,9 +11,10 @@ app.use(loggerMiddleware);
 // CORS configuration
 const corsOptions: cors.CorsOptions = {
     origin: (origin, callback) => {
-        // Allow requests from localhost:5173 and *.xyz.ai
-        //TODO: can update later
-        const allowedOrigins = ['http://localhost:5173', '*'];
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'https://ui-service-678554499597.asia-south1.run.app'
+        ];
         const wildcardDomain = /\.xyz\.ai$/;
 
         if (!origin || allowedOrigins.includes(origin) || wildcardDomain.test(origin)) {
