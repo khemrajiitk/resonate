@@ -72,7 +72,7 @@ export const ConversionComponent = () => {
             style={{
                 boxShadow: "0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgb(0 0 0 / 0.05)"
             }}
-            className="fixed bottom-[calc(4rem+1.5rem)] right-0 mr-4 bg-white p-6 rounded-lg border border-[#e5e7eb] w-[440px] h-[634px]"
+            className="fixed bottom-0 md:bottom-[calc(4rem+1.5rem)] right-0 mr-0 md:mr-4 bg-white p-4 md:p-4 rounded-lg border border-[#e5e7eb] w-full md:w-[440px] h-full md:h-[634px]"
         >
             <div className="flex flex-col space-y-1.5 pb-6">
                 <h2 className="font-semibold text-lg tracking-tight flex items-center space-x-2">
@@ -84,7 +84,7 @@ export const ConversionComponent = () => {
                 <p className="text-sm text-[#6b7280] leading-3">Hi, how can I help you today?</p>
             </div>
 
-            <div className="pr-4 h-[474px] overflow-y-auto">
+            <div className="pr-4 h-[calc(100vh-172px)] md:h-[474px] overflow-y-auto">
                 {chats.map((chat, index) =>
                     chat.userType === "user" ? (
                         <UserMessageComponent key={index} chat={chat} />
